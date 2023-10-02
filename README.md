@@ -20,8 +20,6 @@
   4. src/App.css: 특정 컴포넌트 CSS를 담을 수 있다.
   5. src/App.test.js: 단위 테스트 코드
 
-
-
 - 함수 컴포넌트 생성 방법
   function FirstComponent() {
     return(
@@ -57,3 +55,23 @@
   2. 각 컴포넌트를 관리하는 컴포넌트를 만들어 사용한다.
  
 
+
+
+
+10. Counter 예제를 통해 React 컴포넌트 살펴보기
+- JSX에서 함수 호출시 onClick={incrementCounterFunction}과 같이 중괄호에 함수명만 쓴다.
+
+- State: 리액트의 내장 객체로서 컴포넌트의 데이터 또는 정보를 저장하는데 사용
+  
+- useState 사용법: import { useState } from 'react'를 한 다음 const[count, setCount] useState(0)를 통해 배열로 값을 매핑한다. count에는 ()안에 지정한 초기값이, setCount에는 함수가 들어간다.
+  
+- react에서 인자값 넘겨주는 법: <컴포넌트명 인자이름=인자값>을 통해 건네주고 컴포넌트 내에서는 function 컴포넌트명({인자이름}) 으로 사용한다. 함수도 인자로 넘겨 줄 수 있다. 
+
+- import { PropTypes } from 'prop-types' 를 한 다음
+
+  컴포넌트명.propTypes ={
+    인자: PropTypes.number
+  } 인자값의 타입을 지정해 줄 수 있다. 다만 실행은 가능/ 경고만 발생
+  컴포넌트명.defaultProps ={
+    인자명: 1
+  } 인자값의 기본값을 지정해 줄 수 있다.
