@@ -155,7 +155,7 @@
   밑에 방식을 많이 채택하여 사용함.
 
 - 인증 라우터로 React라우터 보호하기 -로그인이 된 상태에만 라우터로 이동이 가능하게 하기
-  1. 로그인과 로그아웃 관련 로직을 AuthContext.js에 넣는다.
+  1. 로그인과 로그아웃 관련 로직을 AuthContext.js에 넣는다. 
   2. 로그인과 로그아웃 함수도 Provider value에 넣어 함수에 실어 보낸다.
   3. 총괄 컴포넌트에서 인증라우트 컴포넌트를 생성한뒤 매개변수로 {children}을 받아와 authContex에서 isAuthenticated이 참일 때만 children을 반환한다.
   4. 참이 아닐때는 <Navigate>태그를 이용해 <Navigate to="/" />를 반환한다.
@@ -165,3 +165,105 @@
             <WelcomeComponent />
         </AuthenticatedRoute>
       } />
+
+
+12. Spring Boot REST API와 React 프론트엔드 연결하기 -JAVA 풀스택 앱
+- Axios: 리액트를 사용할 때 REST API를 호출하기 위해 가정 널리 사용하는 프레임워크
+  1. 의존성을 추가해야한다. npm install axios
+  2. import axios from 'axios' 하여 임포트 한다.
+  3. axios.get('http://localhost:8080/hello-world')
+           .then((response) => successfulResponse(response)) //응답이 성공 했을 때 호출
+           .catch((error) => errorResponse(error)) //응답이 실패 했을 때 호출
+           .finally(() => console.log('cleanup')); //응답의 실패유무와 상관없이 호출
+
+- 크로스 오리진: 포트넘버 3000에서 8080과 같이 다른 포트번호 웹사이트를 호출하는경우 (COR)
+- 스프링 부트에서 CORS를 정의하는 WebMvcConfigurer 인터페이스를 생성하여 콜백 메서드를 호출한다.
+  @Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			public void addCorsMappings(CorsRegistry registry) {  //Cors를 매핑하는 함수
+				registry.addMapping("/**") // 특정한 패턴에 대해 COR 처리를 가능하게 해줌
+				.allowedMethods("*") //어떤 종류의 메서드가 허용되는지
+				.allowedOrigins("http://localhost:3000"); //요청이 어디서 오는지
+			}
+		};
+
+- useEffect //컴포넌트가 렌더링 될 때마다 특정 작업을 실행할 수 있도록 하는 Hook이다.
+
+- formik //form관리 라이브러리 
+  1. 의존성을 추가해야한다. npm install formik
+  2. import { Formik } from "formik" 하여 임포트 한다.
+  3. <Formik initialValues={ {description, targetDate} } enableReinitialize = {true} onSubmit={onSubmit} validate={validate} validateOnChange = {false} validateOnBlur = {false}>
+             // initialValues초기값설정, enableReinitialize재초기화, onSubmit폼내에서 submit시 실행함수, validate유효성검사 함수, validateOnChange입력할때마다 유효성 검사, validateOnBlur입력이 떠날시 유효성 검사
+                    {
+                        (props) => (
+                            <Form>  //Form를 formik에서 임포트하여 사용
+                                <ErrorMessage name="description" component="div" className="alert alert-warning" /> //ErrorMessage를 formik에서 임포트하여 사용 
+                                <ErrorMessage name="targetDate" component="div" className="alert alert-warning" />
+                                <fieldset className="form-group">
+                                    <label>Description</label>
+                                    <Field type="text" className="form-control" name="description"/> //Field를 formik에서 임포트하여 사용 
+                                </fieldset>
+                                <fieldset className="form-group">
+                                    <label>Target Date</label>
+                                    <Field type="date" className="form-control" name="targetDate"/>
+                                </fieldset>
+                                <div>
+                                    <button className="btn btn-success m-5" type="submit">Save</button>
+                                </div>
+                            </Form>
+                        )
+                    }
+                </Formik>
+
+     function onSubmit(values) { //Submit함수, 매개변수로 입력값을 받는다.
+     console.log(values);
+     }
+
+     function validate(values){ //유효성 검사 함수, 매개변수로 입력값을 받는다.
+        let errors = {
+            // description: '유효한 설명을 입력하십시오',
+            // targetDate: '유효한 목표 날짜를 입력하십시오'
+        }
+
+        if(values.description.length < 5) {
+            errors.description = '최소한 5글자를 입력하십시오';
+        }
+
+        if(values.targetDate = null) {
+            errors.targetDate = '목표 날짜를 입력하십시오';
+        }
+
+        console.log(values);
+
+        return errors;
+    }
+                
+- moment //날짜형식화 라이브러리
+  1. 의존성을 추가해야한다. npm install moment
+  2. import moment from "moment/moment" 하여 임포트 한다.
+  3. moment(values.targetDate).isValid() //values.targetDate 값이 유효한 값인지 확인하는 함수
+
+- Spring Security CSRF 보호 비활성화
+  1. @Bean
+      public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+          // 모든 HTTP 요청에 대한 권한 설정
+          http.authorizeHttpRequests(
+                  auth -> auth.anyRequest().authenticated()
+          );
+      
+        // HTTP 기본 인증 활성화
+        http.httpBasic(Customizer.withDefaults());
+    
+        // 세션 관리 설정: STATELESS 모드로 세션을 생성하지 않음
+        http.sessionManagement(
+                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+    
+        // CSRF 보호 비활성화
+        http.csrf().disable();
+    
+        // 구성된 SecurityFilterChain 반환
+        return http.build();
+    }
+  
