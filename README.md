@@ -266,4 +266,8 @@
         // 구성된 SecurityFilterChain 반환
         return http.build();
     }
-  
+
+  14. JUnit으로 단위 테스트하기
+      1. Source폴더를 test라고 만든다.
+      2. JUnit Test Case 파일을 만든다.
+      3. assertEquals("예상값", "나온값")으로 단위테스트를 한다. 
